@@ -5,14 +5,16 @@ from selenium.webdriver.common.by import By
 
 from webdriver_manager.chrome import ChromeDriverManager
 
-from googletrans import Translator
+import cutlet
 
 import os
 
 #setup translate
-translator = Translator()
+katsu = cutlet.Cutlet()
 
 #how to translate use -> tlline = translator.translate(line, dest="en", src="ko")
+url = "https://www.lyrical-nonsense.com/lyrics/endorfin/suisai-no-canary/"
+
 
 #-----------------------------------
 #setting up Selenium
@@ -27,22 +29,32 @@ options.add_argument(f'user-data-dir={dir_path}/selenium')
 #start the driver
 #windows
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-
-
 driver.implicitly_wait(0) #wait infinitely
 
 #go to the site with the lyrics
-driver.get("https://www.lyrical-nonsense.com/lyrics/endorfin/suisai-no-canary/")
+driver.get(url)
 #-----------------------------------
+
+titleele = driver.find_element(By.CLASS_NAME, "titletext")
+title = titleele.get_attribute("innerText").split()[0]
 
 #get the p tags 
 ptags = driver.find_elements("xpath", "//div[contains(@id, 'PriLyr')]/p")
 
+fullroma = ""
 
 for p in ptags:
-    rawjptext = p.get_attribute("innerText"))
-    romantext = translator.romanizeText("jp", "rawjptext")
-    print(rawjptext)
-    print()
+    rawjptext = p.get_attribute("innerText")
+    lines = rawjptext.split("\n")
+    for line in lines:
+        romantext = katsu.romaji(line)
+        fullroma += romantext + "\n"
+    fullroma += "\n"
+
+driver.close()
+ 
+print(fullroma)
     
+filename = title+".txt"
+with open(filename, "w") as f:
+    f.write(fullroma)

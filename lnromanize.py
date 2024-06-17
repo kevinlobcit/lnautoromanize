@@ -56,5 +56,6 @@ driver.close()
 print(fullroma)
     
 filename = title+".txt"
-with open(filename, "w") as f:
+completepath = os.path.join(dir_path+"\\songs\\", filename)
+with open(completepath, "w") as f:
     f.write(fullroma)
